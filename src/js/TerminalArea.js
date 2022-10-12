@@ -51,7 +51,7 @@ term.onKey((key) => {
   //if 'backspace' delete a char on both curr_input and terminal
   else if (char === "Backspace" || char === "Delete") {
     term.write("\b \b");
-    curr_input = curr_input.substring(0, curr_input - 2);
+    curr_input = curr_input.substring(0, curr_input.length - 1);
   }
   //if 'left arrow' go back a character
   else if (char == "ArrowLeft") {
