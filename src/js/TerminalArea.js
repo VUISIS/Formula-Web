@@ -77,11 +77,13 @@ term.onKey((key) => {
     }
   }
   else if (char == "v" && key.domEvent.ctrlKey) {
-    navigator.clipboard.readText().then(
-        (text) => {
-          term.write(text);
-          curr_input = curr_input + text;
-        });
+    try {
+      navigator.clipboard.readText().then(
+          (text) => {
+            term.write(text);
+            curr_input = curr_input + text;
+          });
+    } catch (e) {}
   }
   //else add char to both curr_input and terminal
   else {
