@@ -16,7 +16,7 @@ var curr_input = ""; //var to keep track of user input in the terminal
 var term = new Terminal({
   //cursor and '\r' for every new line
   cursorBlink: true,
-  cursorBlink: "block",
+  cursorStyle: "block",
   convertEol: true,
 });
 
@@ -49,7 +49,7 @@ term.onKey((key) => {
     curr_input = "";
   }
   //if 'backspace' delete a char on both curr_input and terminal
-  else if (char === "Backspace") {
+  else if (char === "Backspace" || char === "Delete") {
     term.write("\b \b");
     curr_input = curr_input.substring(0, curr_input - 2);
   }
@@ -68,6 +68,20 @@ term.onKey((key) => {
   //if 'down arrow' go down a line
   else if (char == "ArrowDown") {
     term.write("\x1b[B");
+  }
+  else if (char == "c" && key.domEvent.ctrlKey) {
+    if (term.hasSelection()) {
+      navigator.clipboard.writeText(term.getSelection()).then(
+          () => {}, () => {}
+      );
+    }
+  }
+  else if (char == "v" && key.domEvent.ctrlKey) {
+    navigator.clipboard.readText().then(
+        (text) => {
+          term.write(text);
+          curr_input = curr_input + text;
+        });
   }
   //else add char to both curr_input and terminal
   else {
