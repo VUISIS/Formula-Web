@@ -41,14 +41,16 @@ wss.on("connection", (ws, req) => {
 
   //spawn a child of formula-dotnet
   const child = spawn("dotnet", [
-    // "/Users/daniel/work/formula/formula-dotnet/Src/CommandLine/bin/Debug/net6.0/CommandLine.dll"
-    "/Users/jiayin/Downloads/formula-dotnet/Src/CommandLine/bin/Debug/net6.0/CommandLine.dll",
+     "/Users/daniel/work/formula/formula-dotnet/Src/CommandLine/bin/Debug/net6.0/CommandLine.dll"
+    //"/Users/jiayin/Downloads/formula-dotnet/Src/CommandLine/bin/Debug/net6.0/CommandLine.dll",
+    //  "/Users/mark/vandy/codes/formula-dotnet/Src/CommandLine/bin/Debug/MacOS/ARM64/net6.0/CommandLine.dll"
   ]);
 
   // store ws and info object (containing child and dir) in a map
   var info = {
     child: child,
     dir: dir,
+    fileLoaded: false
   };
   clients.set(ws, info);
 
@@ -90,8 +92,12 @@ wss.on("connection", (ws, req) => {
       //write values to a temp file in the temp directory
       fs.writeFileSync(clients.get(ws).dir + "/tmp_file.4ml", domain);
 
+      if (clients.get(ws).fileLoaded) {
+        child.stdin.write("unload  /tmp_file.4ml\n");
+      }
       //send 'load tmp file' command to formula-dotnet child process
       child.stdin.write("load " + clients.get(ws).dir + "/tmp_file.4ml\n");
+      clients.get(ws).fileLoaded = true;
     }
     //else if the message is from the terminal area
     else if (msg.type == "user") {
