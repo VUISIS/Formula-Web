@@ -3,9 +3,9 @@
  */
 
 import React, { useRef } from "react";
-import { Terminal } from "xterm";
-import { FitAddon } from "xterm-addon-fit";
-import useCollapse from "react-collapsed";
+import { Terminal } from "@xterm/xterm";
+import { FitAddon } from "@xterm/addon-fit";
+import { useCollapse } from "react-collapsed";
 
 const { ws } = require("./configSocket.js"); //get the ws connection initialized in configSocket.js
 
@@ -72,18 +72,18 @@ term.onKey((key) => {
   else if (char == "c" && key.domEvent.ctrlKey) {
     if (term.hasSelection()) {
       navigator.clipboard.writeText(term.getSelection()).then(
-          () => {}, () => {}
+        () => { }, () => { }
       );
     }
   }
   else if (char == "v" && key.domEvent.ctrlKey) {
     try {
       navigator.clipboard.readText().then(
-          (text) => {
-            term.write(text);
-            curr_input = curr_input + text;
-          });
-    } catch (e) {}
+        (text) => {
+          term.write(text);
+          curr_input = curr_input + text;
+        });
+    } catch (e) { }
   }
   //else add char to both curr_input and terminal
   else {
