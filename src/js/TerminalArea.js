@@ -20,6 +20,9 @@ var term = new Terminal({
   convertEol: true,
 });
 
+var commandHistory = []
+let historyIndex = -1;
+
 document.addEventListener("DOMContentLoaded", function () {
   //open terminal and resize it to fit its container properly
   term.open(document.getElementById("terminal"));
@@ -39,13 +42,29 @@ window.addEventListener("load", (event) => {
   fitAddon.fit();
 });
 
+document.getElementById("terminal-area").addEventListener("click", () => {
+  term.focus();
+});
+
+term.options = {
+  disableStdin: false,
+  macOptionIsMeta: false,
+};
+
 //User input in terminal
 term.onKey((key) => {
   const char = key.domEvent.key;
+  key.domEvent.preventDefault();
   //if 'enter' send curr_input to server
   if (char === "Enter") {
     term.write("\r\n");
     sendTerminalValues();
+
+    if (curr_input.trim() !== "") {
+      commandHistory.push(curr_input);
+      historyIndex = commandHistory.length;
+    }
+
     curr_input = "";
   }
   //if 'backspace' delete a char on both curr_input and terminal
@@ -61,29 +80,46 @@ term.onKey((key) => {
   else if (char == "ArrowRight") {
     term.write("\x1b[C");
   }
-  //if 'up arrow' go up a line
+  //if 'up arrow' retrieve previous command
   else if (char == "ArrowUp") {
-    term.write("\x1b[A");
+    if (historyIndex > 0) {
+      historyIndex--;
+      const previousCommand = commandHistory[historyIndex];
+
+      term.write("\r\x1b[K");
+      term.write(previousCommand);
+      curr_input = previousCommand;
+    }
   }
   //if 'down arrow' go down a line
   else if (char == "ArrowDown") {
-    term.write("\x1b[B");
-  }
-  else if (char == "c" && key.domEvent.ctrlKey) {
-    if (term.hasSelection()) {
-      navigator.clipboard.writeText(term.getSelection()).then(
-        () => { }, () => { }
-      );
+    if (historyIndex < commandHistory.length - 1) {
+      // Move to the next command in history
+      historyIndex++;
+      const nextCommand = commandHistory[historyIndex];
+
+      // Clear the current line and show the next command
+      term.write("\r\x1b[K");
+      term.write(nextCommand);
+      curr_input = nextCommand;
     }
   }
-  else if (char == "v" && key.domEvent.ctrlKey) {
-    try {
-      navigator.clipboard.readText().then(
-        (text) => {
-          term.write(text);
-          curr_input = curr_input + text;
-        });
-    } catch (e) { }
+  else if ((key.domEvent.metaKey || key.domEvent.ctrlKey) && char == "c") {
+    key.domEvent.preventDefault();
+    key.domEvent.stopPropagation();
+    console.log("Intercepted Command+C");
+    if (term.hasSelection()) {
+      navigator.clipboard.writeText(term.getSelection())
+        .then(() => { });
+    }
+  }
+  else if ((key.domEvent.metaKey || key.domEvent.ctrlKey) && char == "v") {
+    key.domEvent.preventDefault();
+    navigator.clipboard.readText().then(
+      (text) => {
+        term.write(text);
+        curr_input += text;
+      })
   }
   //else add char to both curr_input and terminal
   else {
