@@ -42,15 +42,6 @@ window.addEventListener("load", (event) => {
   fitAddon.fit();
 });
 
-document.getElementById("terminal-area").addEventListener("click", () => {
-  term.focus();
-});
-
-term.options = {
-  disableStdin: false,
-  macOptionIsMeta: false,
-};
-
 //User input in terminal
 term.onKey((key) => {
   const char = key.domEvent.key;
@@ -61,7 +52,7 @@ term.onKey((key) => {
     sendTerminalValues();
 
     if (curr_input.trim() !== "") {
-      commandHistory.push(curr_input);
+      commandHistory.push("[]> " + curr_input);
       historyIndex = commandHistory.length;
     }
 
@@ -84,10 +75,10 @@ term.onKey((key) => {
   else if (char == "ArrowUp") {
     if (historyIndex > 0) {
       historyIndex--;
-      const previousCommand = commandHistory[historyIndex];
+      const promptCommand = commandHistory[historyIndex]
+      const previousCommand = promptCommand.substring(4);
 
-      term.write("\r\x1b[K");
-      term.write(previousCommand);
+      term.write("\r\x1b[K" + promptCommand);
       curr_input = previousCommand;
     }
   }
@@ -96,35 +87,36 @@ term.onKey((key) => {
     if (historyIndex < commandHistory.length - 1) {
       // Move to the next command in history
       historyIndex++;
-      const nextCommand = commandHistory[historyIndex];
+      const promptCommand = commandHistory[historyIndex]
+      const nextCommand = promptCommand.substring(4);
 
       // Clear the current line and show the next command
-      term.write("\r\x1b[K");
-      term.write(nextCommand);
+      term.write("\r\x1b[K" + promptCommand);
       curr_input = nextCommand;
     }
-  }
-  else if ((key.domEvent.metaKey || key.domEvent.ctrlKey) && char == "c") {
-    key.domEvent.preventDefault();
-    key.domEvent.stopPropagation();
-    console.log("Intercepted Command+C");
-    if (term.hasSelection()) {
-      navigator.clipboard.writeText(term.getSelection())
-        .then(() => { });
-    }
-  }
-  else if ((key.domEvent.metaKey || key.domEvent.ctrlKey) && char == "v") {
-    key.domEvent.preventDefault();
-    navigator.clipboard.readText().then(
-      (text) => {
-        term.write(text);
-        curr_input += text;
-      })
   }
   //else add char to both curr_input and terminal
   else {
     term.write(char);
     curr_input += char;
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "c" && (e.ctrlKey || e.metaKey)) {
+    if (term.hasSelection()) {
+      navigator.clipboard.writeText(term.getSelection()).then(
+        () => { }, () => { }
+      );
+    }
+  } else if (e.key === "v" && (e.ctrlKey || e.metaKey)) {
+    navigator.clipboard.readText().then(
+      (text) => {
+        term.write(text);
+        curr_input += text;
+      }).catch((e) => {
+        console.log("Paste failed", e);
+      });
   }
 });
 
