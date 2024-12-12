@@ -41,7 +41,9 @@ wss.on("connection", (ws, req) => {
 
   //spawn a child of formula-dotnet
   const child = spawn("dotnet", [
-     "/Users/daniel/work/formula/formula-dotnet/Src/CommandLine/bin/Debug/net6.0/CommandLine.dll"
+    "/Users/sean/formula/Src/CommandLine/bin/Release/MacOS/ARM64/net8.0/VUISIS.Formula.ARM64.dll",
+    "--noninteractive",
+     //"/Users/daniel/work/formula/formula-dotnet/Src/CommandLine/bin/Debug/net6.0/CommandLine.dll"
     //"/Users/jiayin/Downloads/formula-dotnet/Src/CommandLine/bin/Debug/net6.0/CommandLine.dll",
     //  "/Users/mark/vandy/codes/formula-dotnet/Src/CommandLine/bin/Debug/MacOS/ARM64/net6.0/CommandLine.dll"
   ]);

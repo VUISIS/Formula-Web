@@ -77,12 +77,12 @@ body {
 }
 
 .dropdown-content {
-  max-height: 150px;
-  overflow-y: scroll;
+  max-height: 200px;
+  overflow-y: auto;
   display: none;
   position: absolute;
   background-color: #f1f1f1;
-  min-width: 160px;
+  min-width: 200px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
@@ -98,6 +98,9 @@ body {
   padding: 12px 16px;
   text-decoration: none;
   display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dropdown-content a:hover {background-color: #ddd;}
@@ -110,36 +113,79 @@ input[type="file"] {
 }
 
 /* CSS for Common Commands */
-.header {
-  margin-top:4px;
-  margin-left:10px;
-  text-align: center;
-  color: white;
+.commands-container {
+  margin: 20px 10px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.commands-header {
   background: #04AA6D;
-  border: none;
-  padding: 10px 25px;
-  font-size: 16px;
-  border-radius: 4px; 
-}
-
-.content {
-  max-height: 150px;
-  overflow-y: scroll;
-  margin-left:10px;
   color: white;
-  background: #99b0a8;
-  border: none;
-  padding: 10px 25px;
+  padding: 15px 20px;
+  margin: 0;
+  font-size: 18px;
+  border-radius: 8px 8px 0 0;
+  font-weight: bold;
+}
+
+.commands-content {
+  padding: 20px;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.command-section {
+  margin-bottom: 20px;
+}
+
+.command-section h3 {
+  color: #333;
+  margin: 0 0 10px 0;
   font-size: 16px;
-  border-radius: 4px; 
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
+  font-weight: 600;
 }
 
-.content::-webkit-scrollbar { 
-  display: none;  /* Safari and Chrome */
+.command-block {
+  background: #f8f9fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 4px;
+  padding: 12px;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
 }
 
-.content {
+.command-block code {
+  background: #f1f3f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #e83e8c;
+  font-family: 'Courier New', Courier, monospace;
+  margin-right: 12px;
+}
+
+.command-description {
+  color: #666;
   font-size: 14px;
+}
+
+/* Scrollbar styling */
+.commands-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.commands-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.commands-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.commands-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
