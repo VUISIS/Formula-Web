@@ -53,8 +53,7 @@ term.onKey((key) => {
   // console.log("this qunatity", curr_input.slice(4, cursorIndex))
 
   let prevMatch = curr_input.slice(4, cursorIndex).match(/\s*\S+\s*$/);
-  let afterMatch = curr_input.slice(cursorIndex).match(/\s*\S+\s*$/);
-  console.log("cur", cursorIndex)
+  let afterMatch = curr_input.slice(cursorIndex).match(/^\s*\S+/);
 
   //if 'enter' send curr_input to server
   if (char === "Enter") {
@@ -79,14 +78,18 @@ term.onKey((key) => {
   else if (char === "ArrowLeft" && key.domEvent.altKey) {
     if (prevMatch) {
       const charsToMove = prevMatch[0].length; // Characters to move back
-      term.write("\x1b[D".repeat(charsToMove)); // Move terminal cursor back
-      curr_input = curr_input.slice(0, cursorIndex - charsToMove) + curr_input.slice(cursorIndex); // Update cursor position logic
+      console.log("left", cursorIndex - charsToMove);
+      if (cursorIndex - charsToMove >= 4) {
+        term.write("\x1b[D".repeat(charsToMove)); // Move terminal cursor back
+        cursorIndex -= charsToMove;
+      }
     }
   } else if (char === "ArrowRight" && key.domEvent.altKey) {
     if (afterMatch) {
       const charsToMove = afterMatch[0].length; // Characters to move forward
+      console.log("right", cursorIndex + charsToMove);
       term.write("\x1b[C".repeat(charsToMove)); // Move terminal cursor forward
-      curr_input = curr_input.slice(0, cursorIndex) + curr_input.slice(cursorIndex + charsToMove); // Update cursor position logic
+      cursorIndex += charsToMove;
     }
   }
   //if 'left arrow' go back a character
@@ -137,8 +140,16 @@ term.onKey((key) => {
       const charsToDelete = prevMatch[0].length;
       curr_input = curr_input.slice(0, cursorIndex - charsToDelete) + curr_input.slice(cursorIndex);
       cursorIndex -= charsToDelete;
-      // remove char from the display
-      term.write("\b \b".repeat(charsToDelete));
+      console.log("curr_input", curr_input)
+
+      term.write("\x1b[2K\r"); // Clear the line
+      term.write(curr_input); // Rewrite the prompt
+
+      // reposition the cursorIndex
+      let shift = curr_input.length - cursorIndex;
+      if (shift > 0) {
+        term.write(`\x1b[${shift}D`); // Move cursor left by `shift` positions
+      }
     }
   }
   //if 'backspace' delete a char on both curr_input and terminal, but not the []> 
@@ -146,11 +157,13 @@ term.onKey((key) => {
     if (curr_input.length > 4 && cursorIndex > 4) { // disable the deletion of "[]> "
       curr_input = curr_input.slice(0, cursorIndex - 1) + curr_input.slice(cursorIndex);
       cursorIndex--;
-      console.log(cursorIndex, curr_input)
 
       term.write("\x1b[2K\r"); // Clear the line
       term.write(curr_input); // Rewrite the updated input
       let shift = curr_input.length - cursorIndex;
+
+      console.log("curr_input", curr_input)
+
       if (shift > 0) {
         term.write(`\x1b[${shift}D`); // Move cursor left by `shift` positions
       }
@@ -162,10 +175,6 @@ term.onKey((key) => {
     curr_input += char;
     ++cursorIndex;
   }
-  // prevMatch = curr_input.slice(4, cursorIndex).match(/\s*\S+\s*$/);
-  // afterMatch = curr_input.slice(cursorIndex).match(/\s*\S+\s*$/);
-  // console.log(char, cursorIndex, prevMatch, afterMatch);
-  console.log(cursorIndex);
 });
 
 // Copy and paste
