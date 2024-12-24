@@ -41,7 +41,8 @@ wss.on("connection", (ws, req) => {
 
   //spawn a child of formula-dotnet
   const child = spawn("dotnet", [
-     "/Users/daniel/work/formula/formula-dotnet/Src/CommandLine/bin/Debug/net6.0/CommandLine.dll"
+    "/Users/apple/Desktop/DSL_Stuff/formula/Src/CommandLine/bin/Release/MacOS/ARM64/net8.0/VUISIS.Formula.ARM64.dll", "--noninteractive"
+    //  "/Users/daniel/work/formula/formula-dotnet/Src/CommandLine/bin/Debug/net6.0/CommandLine.dll"
     //"/Users/jiayin/Downloads/formula-dotnet/Src/CommandLine/bin/Debug/net6.0/CommandLine.dll",
     //  "/Users/mark/vandy/codes/formula-dotnet/Src/CommandLine/bin/Debug/MacOS/ARM64/net6.0/CommandLine.dll"
   ]);
@@ -55,9 +56,10 @@ wss.on("connection", (ws, req) => {
   clients.set(ws, info);
 
   //function for when child process has exited
-  child.on("exit", function () {
-    console.log("dotnet child process exited.");
+  child.on("exit", function (code, signal) {
+    console.log("dotnet process exited");
   });
+
 
   //function for when child process gets data from formula-dotnet
   child.stdout.on("data", (data) => {
